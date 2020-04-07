@@ -28,6 +28,11 @@ if (NOT TARGET grpc-project)
     set(GOOGLE_CLOUD_CPP_GRPC_SHA256
         "a2034a1c8127e35c0cc7b86c1b5ad6d8e79a62c5e133c379b8b22a78ba370015")
 
+    if (GPR_MANYLINUX_FLAG)
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DGPR_MANYLINUX1=1")
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DGPR_MANYLINUX1=1")
+    endif()
+
     set_external_project_build_parallel_level(PARALLEL)
     set_external_project_vars()
 
@@ -51,6 +56,8 @@ if (NOT TARGET grpc-project)
                    -DgRPC_SSL_PROVIDER=package
                    -DgRPC_CARES_PROVIDER=package
                    -DgRPC_PROTOBUF_PROVIDER=package
+	           -DCMAKE_CXX_FLAGS:STRING=${CMAKE_CXX_FLAGS}
+		   -DCMAKE_C_FLAGS:STRING=${CMAKE_C_FLAGS}
         BUILD_COMMAND ${CMAKE_COMMAND} --build <BINARY_DIR> ${PARALLEL}
         LOG_DOWNLOAD ON
         LOG_CONFIGURE ON
