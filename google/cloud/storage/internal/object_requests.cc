@@ -211,6 +211,22 @@ StatusOr<ListObjectsResponse> ListObjectsResponse::FromHttpResponse(
     result.items.emplace_back(std::move(*parsed));
   }
 
+  // TileDB Patch:
+  // Return common prefixes (i.e. directories) as objects to match the
+  // behavior of S3/Azure.
+  for (auto const& kv : json["prefixes"].items()) {
+    internal::nl::json obj = {
+      {"kind", "storage#object"},
+      {"name", kv.value()}
+    };
+
+    auto parsed = internal::ObjectMetadataParser::FromJson(obj);
+    if (!parsed.ok()) {
+      return std::move(parsed).status();
+    }
+    result.items.emplace_back(std::move(*parsed));
+  }
+
   return result;
 }
 
